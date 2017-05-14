@@ -44,13 +44,13 @@ public class main {
                 System.out.println("\nNada mas la diagonal inferior");
                 System.out.print("Formato:   ");
                 for (int i = 0; i < cities; i++) {
-                    System.out.print(i + "-");
+                    System.out.print(i + ",");
                 }
                 System.out.println("");
                 for (int i = 0; i < cities; i++) {
                     System.out.print("Vertice " + i + ": ");
                     String row = br.readLine();
-                    String[] fields = row.split("\\-");
+                    String[] fields = row.split("\\,");
                     for (int j = 0; j < i + 1; j++) {
                         int cost = Integer.valueOf(fields[j]);
                         costs[i][j] = costs[j][i] = cost;
@@ -59,14 +59,14 @@ public class main {
                 }
             } catch (Exception e) {
                 problem = true;
-                e.printStackTrace();
+                //e.printStackTrace();
             }
         } while (problem);
 
         System.out.println("\nAsi quedo la matriz de adyacencia");
         for (int[] vertex : costs) {
             for (int cost : vertex) {
-                System.out.print(cost + "-");
+                System.out.print(cost + ",");
             }
             System.out.println("");
         }
@@ -77,15 +77,18 @@ public class main {
             for (int j = 0; j < cities; j++) {
                 if (i == j) {
                     completeGraph.get(i).setAirportCost(costs[i][j]);
-                    completeGraph.get(i).addRoadCost(0);
+                    completeGraph.get(i).addRoadCost(-1);
                 } else {
                     completeGraph.get(i).addRoadCost(costs[i][j]);
                 }
             }
         }
-        System.out.println(completeGraph.getLowerNode().number);
+        //System.out.println(completeGraph.getLowerNode().number);
 
         //Procesing
+        
+        completeGraph.bellmanFord(0);
+        String s = "";
     }
 
 }

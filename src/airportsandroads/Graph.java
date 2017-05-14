@@ -51,6 +51,7 @@ public class Graph {
 
     public void bellmanFord(int toNode) {
         int noChange = 0;
+        get(toNode).minimumRoads.add(new Road(toNode, -1, 0));
         for (int i = 1; i < size + 1; i++) { //Really it should be size, because starting in 0 is size - 1...
             if (!searchingMinimumRoads(toNode, toNode, 0, 0, i)) {
                 noChange++;
@@ -75,14 +76,18 @@ public class Graph {
         }*/
         if (jump == jumpRestriction - 1) {
             for (int i = 0; i < get(node).roadsCosts.size(); i++) {
-                if (addMinimumRoad(i, toNode, node, cost + get(node).roadsCosts.get(i))) {
-                    result = true;
+                if (get(node).roadsCosts.get(i) != -1) {
+                    if (addMinimumRoad(i, toNode, node, cost + get(node).roadsCosts.get(i))) {
+                        result = true;
+                    }
                 }
             }
         } else {
             for (int i = 0; i < get(node).roadsCosts.size(); i++) {
-                if (searchingMinimumRoads(toNode, i, cost + get(node).roadsCosts.get(i), jump + 1, jumpRestriction)) {
-                    result = true;
+                if (get(node).roadsCosts.get(i) != -1) {
+                    if (searchingMinimumRoads(toNode, i, cost + get(node).roadsCosts.get(i), jump + 1, jumpRestriction)) {
+                        result = true;
+                    }
                 }
             }
         }
@@ -90,7 +95,27 @@ public class Graph {
     }
 
     public boolean addMinimumRoad(int node, int lastNode, int minimumRoad, int cost) {
-        return get(node).addMinimumRoad(get(lastNode), get(minimumRoad), cost);
+        boolean result = false;
+        if (get(node).number != get(lastNode).number) {
+            int roadNumber = -1;
+            for (int i = 0; i < get(node).minimumRoads.size(); i++) {
+                if (get(node).minimumRoads.get(i).lastNode == get(lastNode).number) {
+                    roadNumber = i;
+                    break;
+                }
+            }
+            if (roadNumber != -1) {
+                if (get(node).minimumRoads.get(roadNumber).cost > cost) {
+                    get(node).minimumRoads.get(roadNumber).minimumRoad = minimumRoad;
+                    get(node).minimumRoads.get(roadNumber).cost = cost;
+                    result = true;
+                }
+            } else {
+                get(node).minimumRoads.add(new Road(lastNode, minimumRoad, cost));
+                result = true;
+            }
+        }
+        return result;
     }
 
     public class Node {
@@ -142,39 +167,15 @@ public class Graph {
             }
         }
 
-        public boolean addMinimumRoad(Node lastNode, Node minimumRoad, int cost) {
-            boolean result = false;
-            if (number != lastNode.number) {
-                int roadNumber = -1;
-                for (int i = 0; i < minimumRoads.size(); i++) {
-                    if (minimumRoads.get(i).lastNode.number == lastNode.number) {
-                        roadNumber = i;
-                        break;
-                    }
-                }
-                if (roadNumber != -1) {
-                    if (minimumRoads.get(roadNumber).cost > cost) {
-                        minimumRoads.get(roadNumber).minimumRoad = minimumRoad;
-                        minimumRoads.get(roadNumber).cost = cost;
-                        result = true;
-                    }
-                } else {
-                    minimumRoads.add(new Road(lastNode, minimumRoad, cost));
-                    result = true;
-                }
-            }
-            return result;
-        }
-
     }
 
     public class Road {
 
         int cost;
-        Node lastNode;
-        Node minimumRoad;
+        int lastNode;
+        int minimumRoad;
 
-        public Road(Node lastNode, Node minimumRoad, int cost) {
+        public Road(int lastNode, int minimumRoad, int cost) {
             this.lastNode = lastNode;
             this.minimumRoad = minimumRoad;
             this.cost = cost;
