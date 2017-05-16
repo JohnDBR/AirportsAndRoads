@@ -20,13 +20,21 @@ public class Graph {
     private LinkedList<Node> nodes = new LinkedList<>();
     private LinkedList<Integer> airports = new LinkedList<>();
 
-    public Graph(int order, int size) {
+    public Graph(int order) {
         this.order = order;
-        this.size = size;
+        this.size = order * (order - 1) / 2;
     }
 
     public void addNode(int number) {
         nodes.add(new Node(number));
+    }
+    
+    public int getNodesSize(){
+        return nodes.size();
+    }
+
+    public LinkedList<Node> getNodes() {
+        return nodes;
     }
 
     public void minimumNetworkCost() {
@@ -225,6 +233,7 @@ public class Graph {
         int number;
         int totalCost = -1;
         int airportCost;
+        public String name;
 
         LinkedList<Integer> roadsCosts = new LinkedList<>();
 
@@ -235,6 +244,8 @@ public class Graph {
             this.number = number;
             this.airportCost = airportCost;
         }
+        
+        
 
         public int getNumber() {
             return number;
