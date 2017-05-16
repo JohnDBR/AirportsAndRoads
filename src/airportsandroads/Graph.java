@@ -32,7 +32,9 @@ public class Graph {
     public void minimumNetworkCost() {
         searchingNetworkConnection(getLowerNode().number);
         for (int i = 0; i < nodes.size(); i++) {
-            searchingNetworkConnection(i);
+            if (getLowerNode().number != i) {
+                searchingNetworkConnection(i);
+            }
         }
         //searchingNetworkConnection(getLowerNode().number);
         cleanAirports();
@@ -42,16 +44,23 @@ public class Graph {
     }
 
     public int findRoadsCosts(int node) {
-        int totalCost = 0;
-        int nodeCost = get(node).selectedRoad.cost;
-        if (nodeCost == -1) {
+        int totalCost = 0, nodeCost = 0;
+        if (get(node).selectedRoad != null) {
+            nodeCost = get(node).selectedRoad.cost;
+            if (nodeCost == -1) {
+                nodeCost = 0;
+            }
+        } else {
             nodeCost = 0;
         }
         for (int i = 0; i < nodes.size(); i++) {
-            if (get(i).selectedRoad.minimumRoad == node) {
-                totalCost = totalCost + get(i).selectedRoad.cost - nodeCost + findRoadsCosts(i);
+            if (get(i).selectedRoad != null) {
+                if (get(i).selectedRoad.minimumRoad == node) {
+                    totalCost = totalCost + get(i).selectedRoad.cost - nodeCost + findRoadsCosts(i);
+                }
             }
         }
+
         return totalCost;
 
     }
@@ -68,8 +77,16 @@ public class Graph {
         if (selectedRoad != -1) {
             get(node).selectedRoad = get(node).minimumRoads.get(selectedRoad);
         } else {
-            airports.add(node);
             bellmanFord(node);
+            for (int i = 0; i < get(node).minimumRoads.size(); i++) { //selectedRoad can't be null
+                int cost = get(node).minimumRoads.get(i).cost;
+                if (cost < lowerCost && cost < get(node).airportCost) {
+                    lowerCost = cost;
+                    selectedRoad = i;
+                }
+            }
+            get(node).selectedRoad = get(node).minimumRoads.get(selectedRoad);
+            airports.add(node);
         }
         //for (int i = 0; i < get(node).roadsCosts.size(); i++) {
         //    if (get(node).roadsCosts.get(i) != -1) {
@@ -85,6 +102,7 @@ public class Graph {
                 if (get(j).selectedRoad != null) {
                     if (get(j).selectedRoad.lastNode == airports.get(i)) {
                         someRoadToAirport = true;
+                        break;
                         //Should break here, but I'm scared... or make a while but dont!
                     }
                 }
@@ -119,10 +137,10 @@ public class Graph {
     }
 
     private void setLowerNode() {
-        int lowerCost = 999;
+        int lowerCost = 9999;
         for (Node node : nodes) {
-            if (node.totalCost < lowerCost) {
-                lowerCost = node.totalCost;
+            if (node.getTotalCost() < lowerCost) {
+                lowerCost = node.getTotalCost();
                 lowerNode = node.number;
             }
         }
