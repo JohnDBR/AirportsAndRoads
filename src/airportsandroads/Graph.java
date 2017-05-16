@@ -48,8 +48,6 @@ public class Graph {
             nodeCost = 0;
         }
         for (int i = 0; i < nodes.size(); i++) {
-            boolean b = get(i).selectedRoad.minimumRoad == node;
-            int a = get(i).selectedRoad.cost;
             if (get(i).selectedRoad.minimumRoad == node) {
                 totalCost = totalCost + get(i).selectedRoad.cost - nodeCost + findRoadsCosts(i);
             }
