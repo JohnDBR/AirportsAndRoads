@@ -83,11 +83,13 @@ public class main {
                 }
             }
         }
-        //System.out.println(completeGraph.getLowerNode().number);
 
         //Procesing
-        
-        completeGraph.bellmanFord(0);
+        //System.out.println(completeGraph.getLowerNode().number);
+        //completeGraph.bellmanFord(0);
+        completeGraph.minimumNetworkCost();
+        System.out.println("\n" + completeGraph.getMinimumNetworkCost()
+        );
         String s = "";
     }
 

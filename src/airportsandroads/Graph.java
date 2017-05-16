@@ -16,7 +16,9 @@ public class Graph {
     private int order;
     private int size;
     private int lowerNode = -1;
+    private int minimumNetworkCost = 0;
     private LinkedList<Node> nodes = new LinkedList<>();
+    private LinkedList<Integer> airports = new LinkedList<>();
 
     public Graph(int order, int size) {
         this.order = order;
@@ -25,6 +27,86 @@ public class Graph {
 
     public void addNode(int number) {
         nodes.add(new Node(number));
+    }
+
+    public void minimumNetworkCost() {
+        searchingNetworkConnection(getLowerNode().number);
+        for (int i = 0; i < nodes.size(); i++) {
+            searchingNetworkConnection(i);
+        }
+        //searchingNetworkConnection(getLowerNode().number);
+        cleanAirports();
+        for (int i = 0; i < airports.size(); i++) {
+            minimumNetworkCost = minimumNetworkCost + get(airports.get(i)).airportCost + findRoadsCosts(airports.get(i));
+        }
+    }
+
+    public int findRoadsCosts(int node) {
+        int totalCost = 0;
+        int nodeCost = get(node).selectedRoad.cost;
+        if (nodeCost == -1) {
+            nodeCost = 0;
+        }
+        for (int i = 0; i < nodes.size(); i++) {
+            boolean b = get(i).selectedRoad.minimumRoad == node;
+            int a = get(i).selectedRoad.cost;
+            if (get(i).selectedRoad.minimumRoad == node) {
+                totalCost = totalCost + get(i).selectedRoad.cost - nodeCost + findRoadsCosts(i);
+            }
+        }
+        return totalCost;
+
+    }
+
+    public void searchingNetworkConnection(int node) {
+        int lowerCost = 9999, selectedRoad = -1;
+        for (int i = 0; i < get(node).minimumRoads.size(); i++) {
+            int cost = get(node).minimumRoads.get(i).cost;
+            if (cost < lowerCost && cost < get(node).airportCost) {
+                lowerCost = cost;
+                selectedRoad = i;
+            }
+        }
+        if (selectedRoad != -1) {
+            get(node).selectedRoad = get(node).minimumRoads.get(selectedRoad);
+        } else {
+            airports.add(node);
+            bellmanFord(node);
+        }
+        //for (int i = 0; i < get(node).roadsCosts.size(); i++) {
+        //    if (get(node).roadsCosts.get(i) != -1) {
+        //        searchingNetworkConnection(i);
+        //    }
+        //}
+    }
+
+    public void cleanAirports() {
+        for (int i = 0; i < airports.size(); i++) {
+            boolean someRoadToAirport = false;
+            for (int j = 0; j < nodes.size(); j++) {
+                if (get(j).selectedRoad != null) {
+                    if (get(j).selectedRoad.lastNode == airports.get(i)) {
+                        someRoadToAirport = true;
+                        //Should break here, but I'm scared... or make a while but dont!
+                    }
+                }
+            }
+            if (!someRoadToAirport) {
+                int lowerCost = 9999, selectedRoad = -1;
+                for (int j = 0; j < get(airports.get(i)).minimumRoads.size(); j++) {
+                    int cost = get(airports.get(i)).minimumRoads.get(i).cost;
+                    if (cost < lowerCost && cost < get(airports.get(i)).airportCost) {
+                        lowerCost = cost;
+                        selectedRoad = j;
+                    }
+                }
+                if (selectedRoad != -1) {
+                    get(airports.get(i)).selectedRoad = get(airports.get(i)).minimumRoads.get(selectedRoad);
+                    airports.remove(i);
+                    i--;
+                }
+            }
+        }
     }
 
     public Node get(int node) {
@@ -118,6 +200,10 @@ public class Graph {
         return result;
     }
 
+    public int getMinimumNetworkCost() {
+        return minimumNetworkCost;
+    }
+
     public class Node {
 
         int number;
@@ -126,6 +212,7 @@ public class Graph {
 
         LinkedList<Integer> roadsCosts = new LinkedList<>();
 
+        Road selectedRoad = null;
         LinkedList<Road> minimumRoads = new LinkedList<>();
 
         public Node(int number) {
