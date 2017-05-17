@@ -20,17 +20,43 @@ public class Graph {
     private int minimumNetworkCost = 0;
     //private LinkedList<Node> nodes = new LinkedList<>();
     //private LinkedList<Integer> airports = new LinkedList<>();
-
+    
+    private int[][] costs;
     private int[][] minimumCosts;
+    private int[][] minimumRoads;
+    private int[][] minimumRoadsCost;
+    private int[] totalCosts;    
+    private int[] selectedRoads;    
 
-    public Graph(int order, int size) {
+    public Graph(int order, int size, int[][] costs) {
         this.order = order;
         this.size = size;
+        this.costs = costs;
         minimumCosts = new int[order][order];
         for (int[] nodes : minimumCosts) {
             Arrays.fill(nodes, -1);
         }
+        minimumRoads = new int[order][order];
+        for (int[] nodes : minimumRoads) {
+            Arrays.fill(nodes, -1);
+        }
+        minimumRoadsCost = new int[order][order];
+        for (int[] nodes : minimumRoadsCost) {
+            Arrays.fill(nodes, -1);
+        }
+        totalCosts = new int[order];
+        selectedRoads = new int[order];
+        Arrays.fill(selectedRoads, -1);
     }
+    private void setTotalCosts() {
+            totalCost = totalCost + airportCost;
+            for (int i = 0; i < roadsCosts.size(); i++) {
+                totalCost = totalCost + roadsCosts.get(i);
+            }
+            //for (Integer roadCost : roadsCosts) {
+            //    totalCost = totalCost + roadCost;
+            //}
+        }
 
     public void addNode(int number) {
         nodes.add(new Node(number));
@@ -240,75 +266,6 @@ public class Graph {
 
     public int[][] getMatrixOfMinimumNetworkCost() {
         return minimumCosts;
-    }
-
-    public class Node {
-
-        int number;
-        int totalCost = -1;
-        int airportCost;
-
-        //LinkedList<Integer> roadsCosts = new LinkedList<>();
-
-        Road selectedRoad = null;
-        //LinkedList<Road> minimumRoads = new LinkedList<>();
-
-        public Node(int number) {
-            this.number = number;
-            this.airportCost = airportCost;
-        }
-
-        public int getNumber() {
-            return number;
-        }
-
-        public void setAirportCost(int airportCost) {
-            this.airportCost = airportCost;
-        }
-
-        public int getAirportCost() {
-            return airportCost;
-        }
-
-        public void addRoadCost(int cost) {
-            roadsCosts.add(cost);
-        }
-
-        public int getRoadCost(int road) {
-            return roadsCosts.get(road);
-        }
-
-        public int getTotalCost() {
-            if (totalCost == -1) {
-                setTotalCost();
-            }
-            return totalCost;
-        }
-
-        private void setTotalCost() {
-            totalCost = totalCost + airportCost;
-            for (int i = 0; i < roadsCosts.size(); i++) {
-                totalCost = totalCost + roadsCosts.get(i);
-            }
-            //for (Integer roadCost : roadsCosts) {
-            //    totalCost = totalCost + roadCost;
-            //}
-        }
-
-    }
-
-    public class Road {
-
-        int cost;
-        int lastNode;
-        int minimumRoad;
-
-        public Road(int lastNode, int minimumRoad, int cost) {
-            this.lastNode = lastNode;
-            this.minimumRoad = minimumRoad;
-            this.cost = cost;
-        }
-
     }
 
 }

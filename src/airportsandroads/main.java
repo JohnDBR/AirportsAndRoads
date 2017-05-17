@@ -71,7 +71,7 @@ public class main {
             System.out.println("");
         }
 
-        Graph completeGraph = new Graph(cities, cities * (cities - 1) / 2);
+        Graph completeGraph = new Graph(cities, cities * (cities - 1) / 2, costs);
         for (int i = 0; i < cities; i++) {
             completeGraph.addNode(i);
             for (int j = 0; j < cities; j++) {
