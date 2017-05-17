@@ -5,6 +5,7 @@
  */
 package airportsandroads;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 
 /**
@@ -20,9 +21,15 @@ public class Graph {
     private LinkedList<Node> nodes = new LinkedList<>();
     private LinkedList<Integer> airports = new LinkedList<>();
 
+    private int[][] minimumCosts;
+
     public Graph(int order, int size) {
         this.order = order;
         this.size = size;
+        minimumCosts = new int[order][order];
+        for (int[] nodes : minimumCosts) {
+            Arrays.fill(nodes, -1);
+        }
     }
 
     public void addNode(int number) {
@@ -39,6 +46,7 @@ public class Graph {
         //searchingNetworkConnection(getLowerNode().number);
         cleanAirports();
         for (int i = 0; i < airports.size(); i++) {
+            minimumCosts[airports.get(i)][airports.get(i)] = get(airports.get(i)).getAirportCost();
             minimumNetworkCost = minimumNetworkCost + get(airports.get(i)).airportCost + findRoadsCosts(airports.get(i));
         }
     }
@@ -56,7 +64,12 @@ public class Graph {
         for (int i = 0; i < nodes.size(); i++) {
             if (get(i).selectedRoad != null) {
                 if (get(i).selectedRoad.minimumRoad == node) {
-                    totalCost = totalCost + get(i).selectedRoad.cost - nodeCost + findRoadsCosts(i);
+                    int edgeCost = get(i).selectedRoad.cost - nodeCost;
+                    if (node != i) {
+                        minimumCosts[node][i] = edgeCost;
+                        minimumCosts[i][node] = edgeCost;
+                    }
+                    totalCost = totalCost + edgeCost + findRoadsCosts(i);
                 }
             }
         }
@@ -218,6 +231,10 @@ public class Graph {
 
     public int getMinimumNetworkCost() {
         return minimumNetworkCost;
+    }
+
+    public int[][] getMatrixOfMinimumNetworkCost() {
+        return minimumCosts;
     }
 
     public class Node {

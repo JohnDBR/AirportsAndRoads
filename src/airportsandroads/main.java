@@ -35,7 +35,7 @@ public class main {
 
         costs = new int[cities][cities];
         for (int[] cost : costs) {
-            Arrays.fill(cost, 0);
+            Arrays.fill(cost, -1);
         }
 
         do {
@@ -88,9 +88,16 @@ public class main {
         //System.out.println(completeGraph.getLowerNode().number);
         //completeGraph.bellmanFord(0);
         completeGraph.minimumNetworkCost();
-        System.out.println("\n" + completeGraph.getMinimumNetworkCost()
-        );
-        String s = "";
+
+        System.out.println("\n" + completeGraph.getMinimumNetworkCost() + "\n");
+        System.out.println("Asi quedo la matriz de adyacencia de la conexion con menor costo");
+        for (int[] vertex : completeGraph.getMatrixOfMinimumNetworkCost()) {
+            for (int cost : vertex) {
+                System.out.print(cost + ",");
+            }
+            System.out.println("");
+        }
+
     }
 
 }
