@@ -18,8 +18,8 @@ public class Graph {
     private int size;
     private int lowerNode = -1;
     private int minimumNetworkCost = 0;
-    private LinkedList<Node> nodes = new LinkedList<>();
-    private LinkedList<Integer> airports = new LinkedList<>();
+    //private LinkedList<Node> nodes = new LinkedList<>();
+    //private LinkedList<Integer> airports = new LinkedList<>();
 
     private int[][] minimumCosts;
 
@@ -248,10 +248,10 @@ public class Graph {
         int totalCost = -1;
         int airportCost;
 
-        LinkedList<Integer> roadsCosts = new LinkedList<>();
+        //LinkedList<Integer> roadsCosts = new LinkedList<>();
 
         Road selectedRoad = null;
-        LinkedList<Road> minimumRoads = new LinkedList<>();
+        //LinkedList<Road> minimumRoads = new LinkedList<>();
 
         public Node(int number) {
             this.number = number;
