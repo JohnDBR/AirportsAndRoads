@@ -6,7 +6,7 @@
 package airportsandroads;
 
 import java.util.Arrays;
-import java.util.LinkedList;
+import airportsandroads.linkedlist.LinkedList;
 
 /**
  *
@@ -151,13 +151,18 @@ public class Graph {
 
     private void setLowerNode() {
         int lowerCost = 9999;
-        for (Node node : nodes) {
-            if (node.getTotalCost() < lowerCost) {
-                lowerCost = node.getTotalCost();
-                lowerNode = node.number;
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i).getTotalCost() < lowerCost) {
+                lowerCost = nodes.get(i).getTotalCost();
+                lowerNode = nodes.get(i).number;
             }
         }
-
+        //for (Node node : nodes) {
+        //    if (node.getTotalCost() < lowerCost) {
+        //        lowerCost = node.getTotalCost();
+        //        lowerNode = node.number;
+        //    }
+        //}
     }
 
     public void bellmanFord(int toNode) {
@@ -282,9 +287,12 @@ public class Graph {
 
         private void setTotalCost() {
             totalCost = totalCost + airportCost;
-            for (Integer roadCost : roadsCosts) {
-                totalCost = totalCost + roadCost;
+            for (int i = 0; i < roadsCosts.size(); i++) {
+                totalCost = totalCost + roadsCosts.get(i);
             }
+            //for (Integer roadCost : roadsCosts) {
+            //    totalCost = totalCost + roadCost;
+            //}
         }
 
     }
