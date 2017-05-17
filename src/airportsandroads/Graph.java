@@ -6,7 +6,6 @@
 package airportsandroads;
 
 import java.util.Arrays;
-import airportsandroads.linkedlist.LinkedList;
 
 /**
  *
@@ -20,13 +19,13 @@ public class Graph {
     private int minimumNetworkCost = 0;
     //private LinkedList<Node> nodes = new LinkedList<>();
     //private LinkedList<Integer> airports = new LinkedList<>();
-    
+
     private int[][] costs;
     private int[][] minimumCosts;
     private int[][] minimumRoads;
-    private int[][] minimumRoadsCost;
-    private int[] totalCosts;    
-    private int[] selectedRoads;    
+    private int[][] minimumRoadsCosts;
+    private int[] totalCosts;
+    private int[] selectedRoads;
 
     public Graph(int order, int size, int[][] costs) {
         this.order = order;
@@ -40,26 +39,22 @@ public class Graph {
         for (int[] nodes : minimumRoads) {
             Arrays.fill(nodes, -1);
         }
-        minimumRoadsCost = new int[order][order];
-        for (int[] nodes : minimumRoadsCost) {
+        minimumRoadsCosts = new int[order][order];
+        for (int[] nodes : minimumRoadsCosts) {
             Arrays.fill(nodes, -1);
         }
         totalCosts = new int[order];
+        Arrays.fill(totalCosts, 0);
         selectedRoads = new int[order];
         Arrays.fill(selectedRoads, -1);
     }
-    private void setTotalCosts() {
-            totalCost = totalCost + airportCost;
-            for (int i = 0; i < roadsCosts.size(); i++) {
-                totalCost = totalCost + roadsCosts.get(i);
-            }
-            //for (Integer roadCost : roadsCosts) {
-            //    totalCost = totalCost + roadCost;
-            //}
-        }
 
-    public void addNode(int number) {
-        nodes.add(new Node(number));
+    private void setTotalCosts() {
+        for (int i = 0; i < order; i++) {
+            for (int j = 0; j < order; j++) {
+                totalCosts[i] = totalCosts[0] + costs[i][j];
+            }
+        }
     }
 
     public void minimumNetworkCost() {
@@ -106,15 +101,17 @@ public class Graph {
 
     public void searchingNetworkConnection(int node) {
         int lowerCost = 9999, selectedRoad = -1;
-        for (int i = 0; i < get(node).minimumRoads.size(); i++) {
-            int cost = get(node).minimumRoads.get(i).cost;
-            if (cost < lowerCost && cost < get(node).airportCost) {
-                lowerCost = cost;
-                selectedRoad = i;
+        for (int i = 0; i < order; i++) {
+            int cost = minimumRoadsCosts[node][i];
+            if (cost != -1) {
+                if (cost < lowerCost && cost < costs[node][node]) {
+                    lowerCost = cost;
+                    selectedRoad = i;
+                }
             }
         }
         if (selectedRoad != -1) {
-            get(node).selectedRoad = get(node).minimumRoads.get(selectedRoad);
+            selectedRoads[node] = selectedRoad;
         } else {
             bellmanFord(node);
             for (int i = 0; i < get(node).minimumRoads.size(); i++) { //selectedRoad can't be null
@@ -164,36 +161,27 @@ public class Graph {
         }
     }
 
-    public Node get(int node) {
-        return nodes.get(node);
-    }
-
-    public Node getLowerNode() {
+    public int getLowerNode() {
         if (lowerNode == -1) {
             setLowerNode();
         }
-        return nodes.get(lowerNode);
+        return lowerNode;
     }
 
     private void setLowerNode() {
         int lowerCost = 9999;
-        for (int i = 0; i < nodes.size(); i++) {
-            if (nodes.get(i).getTotalCost() < lowerCost) {
-                lowerCost = nodes.get(i).getTotalCost();
-                lowerNode = nodes.get(i).number;
+        for (int i = 0; i < order; i++) {
+            if (totalCosts[i] < lowerCost) {
+                lowerCost = totalCosts[i];
+                lowerNode = i;
             }
         }
-        //for (Node node : nodes) {
-        //    if (node.getTotalCost() < lowerCost) {
-        //        lowerCost = node.getTotalCost();
-        //        lowerNode = node.number;
-        //    }
-        //}
     }
 
     public void bellmanFord(int toNode) {
         int noChange = 0;
-        get(toNode).minimumRoads.add(new Road(toNode, -1, 0));
+        minimumRoadsCosts[toNode][toNode] = 0;
+        minimumRoads[toNode][toNode] = -1;
         for (int i = 1; i < size + 1; i++) { //Really it should be size, because starting in 0 is size - 1...
             if (!searchingMinimumRoads(toNode, toNode, 0, 0, i)) {
                 noChange++;
@@ -206,27 +194,17 @@ public class Graph {
 
     public boolean searchingMinimumRoads(int toNode, int node, int cost, int jump, int jumpRestriction) {
         boolean result = false;
-        /*if (jump < jumpRestriction) {
-            for (int i = 0; i < get(node).roadsCosts.size(); i++) {
-                if (addMinimumRoad(i, toNode, node, cost + get(node).roadsCosts.get(i))) {
-                    result = true;
-                }
-                if (searchingMinimumRoads(toNode, i, cost + get(node).roadsCosts.get(i), jump + 1, jumpRestriction)) {
-                    result = true;
-                }
-            }
-        }*/
         if (jump == jumpRestriction - 1) {
-            for (int i = 0; i < get(node).roadsCosts.size(); i++) {
-                if (get(node).roadsCosts.get(i) != -1) {
-                    if (addMinimumRoad(i, toNode, node, cost + get(node).roadsCosts.get(i))) {
+            for (int i = 0; i < order; i++) {
+                if (costs[node][i] != -1 && node != i) {
+                    if (addMinimumRoad(i, toNode, node, cost + costs[node][i])) {
                         result = true;
                     }
                 }
             }
         } else {
-            for (int i = 0; i < get(node).roadsCosts.size(); i++) {
-                if (get(node).roadsCosts.get(i) != -1) {
+            for (int i = 0; i < order; i++) {
+                if (costs[node][i] != -1 && node != i) {
                     if (searchingMinimumRoads(toNode, i, cost + get(node).roadsCosts.get(i), jump + 1, jumpRestriction)) {
                         result = true;
                     }
