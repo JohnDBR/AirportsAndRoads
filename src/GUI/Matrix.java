@@ -1,6 +1,11 @@
 package GUI;
 
 import airportsandroads.Graph;
+import javax.swing.JTable;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 /**
  *
@@ -9,12 +14,16 @@ import airportsandroads.Graph;
 public class Matrix extends javax.swing.JFrame {
 
     Graph g;
+    TableModel model;
+    
     public Matrix(Graph g) {
         initComponents();
+        table.setTableHeader(null);
         this.setVisible(true);
         this.setLocationRelativeTo(null);
-        
+        model = table.getModel();
         this.g = g;
+        initMatrix();
     }
 
     @SuppressWarnings("unchecked")
@@ -76,7 +85,26 @@ public class Matrix extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void initMatrix(){
-        
+        for(int i = 0; i < g.getOrder(); i++){
+            insertcolumn();
+            addRow();
+        }
+//        for(int i = 0; i < 7; i++){
+//            DefaultTableModel temp = (DefaultTableModel) model;    
+//            temp.removeRow(temp.getRowCount()-1);
+//        }
+    }
+    
+    public void insertcolumn (){
+        DefaultTableModel temp = (DefaultTableModel) model;
+        Integer nuevo[]= {0}; //esto es por las tres columnas aunque puede variar
+        temp.addColumn(nuevo);
+    }
+    
+    private void addRow(){
+        DefaultTableModel temp = (DefaultTableModel) model;
+        Integer nuevo[]= {}; //esto es por las tres columnas aunque puede variar
+        temp.addRow(nuevo);
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

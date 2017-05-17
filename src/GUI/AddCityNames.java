@@ -67,10 +67,12 @@ public class AddCityNames extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        if(state < g.getNodesSize()){
+        if(state < g.getOrder() - 1){
             g.addNode(state);
             g.getNodes().get(state).name = Name.getText();
-            if(state == g.getNodesSize() - 1) return;
+            state++;
+            if(state == (g.getOrder() - 1)) jButton1.setText("Finalizar");
+            this.Display_la.setText("Digite el nombre de la ciudad " + (state + 1) + ":");
         }else{
             new Matrix(g);
             this.dispose();
