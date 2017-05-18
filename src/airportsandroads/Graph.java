@@ -58,16 +58,15 @@ public class Graph {
     }
 
     public void minimumNetworkCost() {
-        searchingNetworkConnection(getLowerNode().number);
-        for (int i = 0; i < nodes.size(); i++) {
-            if (getLowerNode().number != i) {
+        searchingNetworkConnection(getLowerNode());
+        for (int i = 0; i < order; i++) {
+            if (getLowerNode() != i) {
                 searchingNetworkConnection(i);
             }
         }
-        //searchingNetworkConnection(getLowerNode().number);
         cleanAirports();
-        for (int i = 0; i < airports.size(); i++) {
-            minimumCosts[airports.get(i)][airports.get(i)] = get(airports.get(i)).getAirportCost();
+        for (int i = 0; i < order; i++) {
+            int airportCost = 0;
             minimumNetworkCost = minimumNetworkCost + get(airports.get(i)).airportCost + findRoadsCosts(airports.get(i));
         }
     }
@@ -102,7 +101,7 @@ public class Graph {
     public void searchingNetworkConnection(int node) {
         int lowerCost = 9999, selectedRoad = -1;
         for (int i = 0; i < order; i++) {
-            int cost = minimumRoadsCosts[node][i];
+            int cost = minimumRoadsCosts[i][node];
             if (cost != -1) {
                 if (cost < lowerCost && cost < costs[node][node]) {
                     lowerCost = cost;
@@ -114,48 +113,44 @@ public class Graph {
             selectedRoads[node] = selectedRoad;
         } else {
             bellmanFord(node);
-            for (int i = 0; i < get(node).minimumRoads.size(); i++) { //selectedRoad can't be null
-                int cost = get(node).minimumRoads.get(i).cost;
-                if (cost < lowerCost && cost < get(node).airportCost) {
+            for (int i = 0; i < order; i++) { //selectedRoad can't be null
+                int cost = minimumRoadsCosts[i][node];
+                if (cost < lowerCost && cost < costs[node][node]) {
                     lowerCost = cost;
                     selectedRoad = i;
                 }
             }
-            get(node).selectedRoad = get(node).minimumRoads.get(selectedRoad);
-            airports.add(node);
+            selectedRoads[node] = selectedRoad;
+            minimumCosts[node][node] = costs[node][node];
         }
-        //for (int i = 0; i < get(node).roadsCosts.size(); i++) {
-        //    if (get(node).roadsCosts.get(i) != -1) {
-        //        searchingNetworkConnection(i);
-        //    }
-        //}
     }
 
     public void cleanAirports() {
-        for (int i = 0; i < airports.size(); i++) {
+        for (int i = 0; i < order; i++) {
             boolean someRoadToAirport = false;
-            for (int j = 0; j < nodes.size(); j++) {
-                if (get(j).selectedRoad != null) {
-                    if (get(j).selectedRoad.lastNode == airports.get(i)) {
-                        someRoadToAirport = true;
-                        break;
-                        //Should break here, but I'm scared... or make a while but dont!
+            if (minimumCosts[i][i] != -1) {
+                for (int j = 0; j < order; j++) {
+                    if (selectedRoads[j] != -1) {
+                        if (selectedRoads[j] == i) {
+                            someRoadToAirport = true;
+                            break;
+                        }
                     }
                 }
-            }
-            if (!someRoadToAirport) {
-                int lowerCost = 9999, selectedRoad = -1;
-                for (int j = 0; j < get(airports.get(i)).minimumRoads.size(); j++) {
-                    int cost = get(airports.get(i)).minimumRoads.get(i).cost;
-                    if (cost < lowerCost && cost < get(airports.get(i)).airportCost) {
-                        lowerCost = cost;
-                        selectedRoad = j;
+                if (!someRoadToAirport) {
+                    int lowerCost = 9999, selectedRoad = -1;
+                    for (int j = 0; j < order; j++) { //get(airports.get(i)).minimumRoads.size()
+                        int cost = minimumRoadsCosts[j][i];
+                        if (cost < lowerCost && cost < costs[i][i]) {
+                            lowerCost = cost;
+                            selectedRoad = j;
+                        }
                     }
-                }
-                if (selectedRoad != -1) {
-                    get(airports.get(i)).selectedRoad = get(airports.get(i)).minimumRoads.get(selectedRoad);
-                    airports.remove(i);
-                    i--;
+                    if (selectedRoad != -1) {
+                        selectedRoads[i] = selectedRoad;
+                        minimumCosts[i][i] = -1;
+                        i--;
+                    }
                 }
             }
         }
@@ -205,7 +200,7 @@ public class Graph {
         } else {
             for (int i = 0; i < order; i++) {
                 if (costs[node][i] != -1 && node != i) {
-                    if (searchingMinimumRoads(toNode, i, cost + get(node).roadsCosts.get(i), jump + 1, jumpRestriction)) {
+                    if (searchingMinimumRoads(toNode, i, cost + costs[node][i], jump + 1, jumpRestriction)) {
                         result = true;
                     }
                 }
@@ -216,22 +211,17 @@ public class Graph {
 
     public boolean addMinimumRoad(int node, int lastNode, int minimumRoad, int cost) {
         boolean result = false;
-        if (get(node).number != get(lastNode).number) {
-            int roadNumber = -1;
-            for (int i = 0; i < get(node).minimumRoads.size(); i++) {
-                if (get(node).minimumRoads.get(i).lastNode == get(lastNode).number) {
-                    roadNumber = i;
-                    break;
-                }
-            }
-            if (roadNumber != -1) {
-                if (get(node).minimumRoads.get(roadNumber).cost > cost) {
-                    get(node).minimumRoads.get(roadNumber).minimumRoad = minimumRoad;
-                    get(node).minimumRoads.get(roadNumber).cost = cost;
+        if (node != lastNode) {
+            int roadCost = minimumRoadsCosts[lastNode][node];
+            if (roadCost != -1) {
+                if (roadCost > cost) {
+                    minimumRoadsCosts[lastNode][node] = cost;
+                    minimumRoads[lastNode][node] = minimumRoad;
                     result = true;
                 }
             } else {
-                get(node).minimumRoads.add(new Road(lastNode, minimumRoad, cost));
+                minimumRoadsCosts[lastNode][node] = cost;
+                minimumRoads[lastNode][node] = minimumRoad;
                 result = true;
             }
         }
