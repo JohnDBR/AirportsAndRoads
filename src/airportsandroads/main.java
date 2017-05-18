@@ -5,9 +5,12 @@
  */
 package airportsandroads;
 
+import airportsandroads.gui.CollectData;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -19,7 +22,7 @@ public class main {
         int cities = 0;
         int[][] costs;
 
-        boolean problem;
+        /*boolean problem;
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         //Storing and preparing data
@@ -70,7 +73,31 @@ public class main {
             }
             System.out.println("");
         }
+        */
+        //GUI
+        System.out.println("GUI Starting!!");
+        CollectData cd = new CollectData();
+        do {
+            try {
+                Thread.sleep(2000);
+            } catch (Exception e) {
+            }
+            System.out.println("Waiting...");
+        } while (!cd.alReady());
 
+        costs = cd.getCostsMatrix();
+        cities = cd.getCities();
+        cd.dispose();
+
+        System.out.println("\nAsi quedo la matriz de adyacencia");
+        for (int[] vertex : costs) {
+            for (int cost : vertex) {
+                System.out.print(cost + ",");
+            }
+            System.out.println("");
+        }
+
+        //Procesing
         Graph completeGraph = new Graph(cities, cities * (cities - 1) / 2);
         for (int i = 0; i < cities; i++) {
             completeGraph.addNode(i);
@@ -84,7 +111,6 @@ public class main {
             }
         }
 
-        //Procesing
         //System.out.println(completeGraph.getLowerNode().number);
         //completeGraph.bellmanFord(0);
         completeGraph.minimumNetworkCost();
@@ -97,7 +123,6 @@ public class main {
             }
             System.out.println("");
         }
-
     }
 
 }
