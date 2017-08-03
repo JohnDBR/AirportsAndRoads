@@ -158,23 +158,42 @@ public class LinkedList<T> {
     }
 
     public void changePosition(int positionA, int positionB) {
-        if (size > 1 && 0 < positionA && positionA < positionB && positionB < size) {
-            Node<T> a = getNode(positionA), b = getNode(positionB);
-            Node<T> antA = getNode(positionA - 1), antB = getNode(positionB - 1);
-            Node<T> aLink = a.getLink(), bLink = b.getLink();
-            if (antA != null) {
-                antA.setLink(b);
+        if (size > 1 && 0 <= positionA && positionA < positionB && positionB < size) {
+            if (positionB == positionA + 1) {
+                Node<T> a = getNode(positionA), b = getNode(positionB);
+                Node<T> antA = getNode(positionA - 1), bLink = b.getLink();
+                if (antA != null) {
+                    antA.setLink(b);
+                } else {
+                    ptr = b;
+                }
+                b.setLink(a);
+                if (bLink != null) {
+                    a.setLink(bLink);
+                } else {
+                    a.setLink(null);
+                    last = a;
+                }
             } else {
-                ptr = b;
+                Node<T> a = getNode(positionA), b = getNode(positionB);
+                Node<T> antA = getNode(positionA - 1), antB = getNode(positionB - 1);
+                Node<T> aLink = a.getLink(), bLink = b.getLink();
+                if (antA != null) {
+                    antA.setLink(b);
+                } else {
+                    ptr = b;
+                }
+                b.setLink(aLink);
+                antB.setLink(a);
+                if (bLink != null) {
+                    a.setLink(bLink);
+                } else {
+                    a.setLink(null);
+                    last = a;
+                }
             }
-            b.setLink(aLink);
-            antB.setLink(a);
-            if (bLink != null) {
-                a.setLink(bLink);
-            } else {
-                a.setLink(null);
-                last = a;
-            }
+        } else if (size > 1 && 0 <= positionB && positionB < positionA && positionA < size) {
+            changePosition(positionB, positionA);
         }
     }
 
